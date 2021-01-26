@@ -198,7 +198,7 @@ impl<K: QuoteValue, V: QuoteValue> QuoteValue for HashMap<K, V> {
 #[cfg(unix)]
 impl QuoteValue for OsString {
     fn quote(&self) -> proc_macro2::TokenStream {
-        let buf = std::os::unix::OsStringExt::into_vec(self.clone()).quote();
+        let buf = std::os::unix::ffi::OsStringExt::into_vec(self.clone()).quote();
         quote!(<::std::ffi::OsString as ::std::os::unix::ffi::OsStringExt>::from_vec(#buf))
     }
 }

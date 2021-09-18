@@ -7,6 +7,14 @@ use {
             HashSet,
         },
         ffi::OsString,
+        ops::{
+            Range,
+            RangeFrom,
+            RangeFull,
+            RangeInclusive,
+            RangeTo,
+            RangeToInclusive,
+        },
         rc::Rc,
         sync::Arc,
     },
@@ -32,6 +40,49 @@ impl_quote_value_via_to_tokens! {
     f32, f64,
     char,
     bool,
+}
+
+impl<Idx: QuoteValue> QuoteValue for Range<Idx> {
+    fn quote(&self) -> proc_macro2::TokenStream {
+        let start = self.start.quote();
+        let end = self.end.quote();
+        quote!((#start..#end))
+    }
+}
+
+impl<Idx: QuoteValue> QuoteValue for RangeFrom<Idx> {
+    fn quote(&self) -> proc_macro2::TokenStream {
+        let start = self.start.quote();
+        quote!((#start..))
+    }
+}
+
+impl QuoteValue for RangeFull {
+    fn quote(&self) -> proc_macro2::TokenStream {
+        quote!(..)
+    }
+}
+
+impl<Idx: QuoteValue> QuoteValue for RangeInclusive<Idx> {
+    fn quote(&self) -> proc_macro2::TokenStream {
+        let start = self.start().quote();
+        let end = self.end().quote();
+        quote!((#start..=#end))
+    }
+}
+
+impl<Idx: QuoteValue> QuoteValue for RangeTo<Idx> {
+    fn quote(&self) -> proc_macro2::TokenStream {
+        let end = self.end.quote();
+        quote!((..#end))
+    }
+}
+
+impl<Idx: QuoteValue> QuoteValue for RangeToInclusive<Idx> {
+    fn quote(&self) -> proc_macro2::TokenStream {
+        let end = self.end.quote();
+        quote!((..=#end))
+    }
 }
 
 macro_rules! impl_quote_value_tuple {

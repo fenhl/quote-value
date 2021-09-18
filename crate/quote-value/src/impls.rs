@@ -1,5 +1,6 @@
 use {
     std::{
+        borrow::Cow,
         collections::{
             BTreeMap,
             BTreeSet,
@@ -243,6 +244,14 @@ impl<K: QuoteValue, V: QuoteValue> QuoteValue for HashMap<K, V> {
             #(#inserts)*
             map
         })
+    }
+}
+
+impl<'a, B: 'a + ToOwned + ?Sized> QuoteValue for Cow<'a, B>
+where B::Owned: QuoteValue {
+    fn quote(&self) -> proc_macro2::TokenStream {
+        let x = self.to_owned().quote();
+        quote!(::std::borrow::Cow::Owned(#x))
     }
 }
 

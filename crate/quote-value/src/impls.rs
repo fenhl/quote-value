@@ -250,7 +250,7 @@ impl<K: QuoteValue, V: QuoteValue> QuoteValue for HashMap<K, V> {
 impl<'a, B: 'a + ToOwned + ?Sized> QuoteValue for Cow<'a, B>
 where B::Owned: QuoteValue {
     fn quote(&self) -> proc_macro2::TokenStream {
-        let x = self.to_owned().quote();
+        let x = <B as ToOwned>::to_owned(self).quote();
         quote!(::std::borrow::Cow::Owned(#x))
     }
 }
